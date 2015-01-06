@@ -7,6 +7,16 @@
 	<packaging>war</packaging>
 	<build>
 		<finalName>${project.artifactId}-${project.version}</finalName>
+		<pluginManagement>
+			<plugins>
+				<!-- Added to support execution of unit test during $ mvn test -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>${version.maven-surefire-plugin}</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 		<plugins>
 			<!-- Added to support integration tests during $ mvn verify -->
 			<plugin>
@@ -91,11 +101,20 @@
 		</dependencies>
 	</dependencyManagement>
 	<dependencies>
+		<!-- BEGIN TEST DEPENDENCIES -->
+		<!-- Support mocking. -->
 		<dependency>
-			<groupId>javax</groupId>
-			<artifactId>javaee-api</artifactId>
-			<version>7.0</version>
-			<scope>provided</scope>
+			<groupId>org.easymock</groupId>
+			<artifactId>easymock</artifactId>
+			<version>${version.easymock}</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- Have fluent matcher API for testing. -->
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<version>${version.assertj-core}</version>
+			<scope>test</scope>
 		</dependency>
 		<!-- Intentionally added to write TestNG tests. -->
 		<dependency>
@@ -144,12 +163,36 @@
 			<artifactId>shrinkwrap-resolver-impl-maven</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<!-- Client required for testing. -->
+		<!-- IT requires a http client. Jersey is used because RESTeasy failed 
+			on (un)marshalling json. -->
 		<dependency>
-			<groupId>org.jboss.resteasy</groupId>
-			<artifactId>resteasy-client</artifactId>
+			<groupId>org.glassfish.jersey.core</groupId>
+			<artifactId>jersey-client</artifactId>
+			<version>${version.jersey-client}</version>
 			<scope>test</scope>
 		</dependency>
+		<!-- JSON processor for the http client -->
+		<dependency>
+			<groupId>org.glassfish.jersey.media</groupId>
+			<artifactId>jersey-media-moxy</artifactId>
+			<version>${version.jersey-media-proxy}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- END TEST DEPENDENCIES -->
+
+		<dependency>
+			<groupId>javax</groupId>
+			<artifactId>javaee-api</artifactId>
+			<version>7.0</version>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+	<groupId>org.jboss.resteasy</groupId>
+	<artifactId>resteasy-jaxrs</artifactId>
+</dependency>
+		
 	</dependencies>
 	<properties>
 		<maven.compiler.source>1.8</maven.compiler.source>
@@ -167,16 +210,20 @@
 		<!-- <version.artifactId>x.x</version.artifactId> -->
 		<version.arquillian-bom>1.1.5.Final</version.arquillian-bom>
 		<version.arquillian-suite-extension>1.1.2</version.arquillian-suite-extension>
+		<version.assertj-core>1.7.0</version.assertj-core>
+		<version.easymock>3.3</version.easymock>
 		<version.jboss-javaee-7.0-with-hibernate>8.2.0.Final</version.jboss-javaee-7.0-with-hibernate>
+		<version.jersey-client>2.14</version.jersey-client>
+		<version.jersey-media-proxy>2.14</version.jersey-media-proxy>
 		<version.maven-dependency-plugin>2.9</version.maven-dependency-plugin>
 		<version.maven-failsafe-plugin>2.18</version.maven-failsafe-plugin>
+		<version.maven-surefire-plugin>2.18</version.maven-surefire-plugin>
 		<version.shrinkwrap-resolver-depchain>2.1.1</version.shrinkwrap-resolver-depchain>
 		<version.testng>6.8.8</version.testng>
 		<version.wildfly-arquillian-container-embedded>8.2.0.Final</version.wildfly-arquillian-container-embedded>
 		<version.wildfly-dist>8.2.0.Final</version.wildfly-dist>
 		<version.wildfly-embedded>8.2.0.Final</version.wildfly-embedded>
 	</properties>
-
 
 	<repositories>
 		<repository>
