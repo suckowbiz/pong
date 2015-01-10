@@ -21,6 +21,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import biz.suckow.pong.business.hosts.entity.Host;
+import biz.suckow.pong.business.security.control.TokenAuthority;
 
 public class HostsResourceIT extends Arquillian {
     private final Client client = ClientBuilder.newClient();
@@ -61,8 +62,10 @@ public class HostsResourceIT extends Arquillian {
 
     @Test
     public void list() {
-	this.client.target(BASE + "/duke1/127.0.0.1/22/ssh").request().post(null);
-	this.client.target(BASE + "/duke2/127.0.0.1/22/ssh").request().post(null);
+	this.client.target(BASE + "/duke1/127.0.0.1/22/ssh").request().header(TokenAuthority.TOKEN_HEADER_NAME, "4711")
+	.post(null);
+	this.client.target(BASE + "/duke2/127.0.0.1/22/ssh").request().header(TokenAuthority.TOKEN_HEADER_NAME, "4711")
+	.post(null);
 
 	final List<Host> hosts = this.client.target(BASE + "/" + HostsResource.RELPATH_LIST_ALL).request()
 		.get(new GenericType<List<Host>>() {

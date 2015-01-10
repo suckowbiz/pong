@@ -11,7 +11,6 @@ import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -44,8 +43,7 @@ public class HostsResource {
     public Response addHost(@NotNull @Size(min = 3) @PathParam("hostname") final String hostname,
 	    @NotNull @Size(min = 7) @PathParam("ip") final String ip,
 	    @NotNull @Size(min = 3) @PathParam("service") final String service,
-	    @NotNull @DecimalMin(value = "1") @PathParam("port") final int port,
-	    @HeaderParam("X-TOKEN") final String token, @Context final UriInfo info) {
+	    @NotNull @DecimalMin(value = "1") @PathParam("port") final int port, @Context final UriInfo info) {
 	final Host remoteHost = new Host().setHostname(hostname).setIp(ip).setPort(port).setService(service);
 	this.store.add(remoteHost);
 
@@ -58,7 +56,7 @@ public class HostsResource {
     @GET
     @Path("{hostname}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getHost(@HeaderParam("X-TOKEN") final String token, @PathParam("hostname") final String hostname)
+    public Response getHost(@PathParam("hostname") final String hostname)
 	    throws URISyntaxException {
 	Response response = Response.status(Status.NOT_FOUND).build();
 	final Optional<Host> possibleHost = this.store.get(hostname);
@@ -71,7 +69,7 @@ public class HostsResource {
     @GET
     @Path(RELPATH_LIST_ALL)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response listAllHosts(@HeaderParam("X-TOKEN") final String token) {
+    public Response listAllHosts() {
 	final List<Host> hosts = this.store.getAll();
 	return Response.ok(hosts).build();
     }
