@@ -2,6 +2,7 @@ package biz.suckow.pong.business.security.boundary;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.Optional;
 
 import javax.annotation.Priority;
 import javax.inject.Inject;
@@ -12,26 +13,41 @@ import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.ext.Provider;
 
-import biz.suckow.pong.business.security.control.TokenAuthority;
+import biz.suckow.pong.business.security.control.UserLocator;
+import biz.suckow.pong.business.security.entity.User;
 
 @Provider
 @PreMatching
 @Priority(Priorities.AUTHENTICATION)
 public class SecurityFilter implements ContainerRequestFilter {
+    public static final String TOKEN_HEADER_NAME ="X-PONG-TOKEN";
+
     @Inject
-    private TokenAuthority authority;
+    private UserLocator userLocator;
 
     // see http://howtodoinjava.com/2013/06/26/jax-rs-resteasy-basic-authentication-and-authorization-tutorial/
     @Override
     public void filter(final ContainerRequestContext context) throws IOException {
-	final String token = context.getHeaderString(TokenAuthority.TOKEN_HEADER_NAME);
+	if (true) {
+	    // disabled so far
+	    return;
+	}
+
+	final String token = context.getHeaderString(TOKEN_HEADER_NAME);
+	final Optional<User> possibleUser = this.userLocator.locate(token);
 	context.setSecurityContext(new SecurityContext() {
 	    public static final String TOKEN_AUTH = "TOKEN_AUTH";
 
 	    @Override
-	    public boolean isUserInRole(final String arg0) {
-		// TODO Auto-generated method stub
-		return false;
+	    public boolean isUserInRole(final String role) {
+		boolean result = false;
+		if (role == null || role.isEmpty()) {
+		    return result;
+		}
+		if (role.equals(possibleUser.get().getRole())) {
+		    result = true;
+		}
+		return result;
 	    }
 
 	    @Override
@@ -41,15 +57,21 @@ public class SecurityFilter implements ContainerRequestFilter {
 
 	    @Override
 	    public Principal getUserPrincipal() {
-		// TODO Auto-generated method stub
-		return null;
+		Principal result = null;
+		if (possibleUser.isPresent()) {
+		    result = () -> possibleUser.get().getUsername();
+		}
+		return result;
 	    }
 
 	    @Override
 	    public String getAuthenticationScheme() {
-		return TOKEN_AUTH;
+		String result = null;
+		if (possibleUser.isPresent()) {
+		    result = TOKEN_AUTH;
+		}
+		return result;
 	    }
 	});
-	// context.abortWith(Response.status(Status.UNAUTHORIZED).build());
     }
 }

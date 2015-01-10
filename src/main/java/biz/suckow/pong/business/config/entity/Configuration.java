@@ -7,4 +7,9 @@ import biz.suckow.pong.business.security.entity.User;
 public class Configuration {
 
     private Set<User> users;
+
+    public Set<User> getUsers() {
+	// TODO Auto-generated method stub
+	return null;
+    }
 }
