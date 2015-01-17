@@ -17,11 +17,10 @@ import org.jboss.arquillian.testng.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.maven.archive.importer.MavenImporter;
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import biz.suckow.pong.business.hosts.entity.Host;
-import biz.suckow.pong.business.security.boundary.SecurityFilter;
+import biz.suckow.pong.business.security.boundary.SecurityRoleFilter;
 
 public class HostsResourceIT extends Arquillian {
     private final Client client = ClientBuilder.newClient();
@@ -30,29 +29,33 @@ public class HostsResourceIT extends Arquillian {
     @Deployment(testable = false)
     @OverProtocol("Servlet 3.0")
     public static WebArchive deploy() {
-	return ShrinkWrap.create(MavenImporter.class).loadPomFromFile("pom.xml").importBuildOutput()
+	return
+		ShrinkWrap.create(MavenImporter.class).loadPomFromFile("pom.xml").importBuildOutput()
 		.as(WebArchive.class);
     }
 
     @Test
     public void verifyEndpointIsAvailable() {
 	final Response response = this.client.target(BASE).request().get();
-	Assert.assertEquals(response.getStatus(), Response.Status.OK.getStatusCode());
+	assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
     }
 
     @Test
     public void verifyAddingAHostReturnsCreated() {
-	final Response response = this.client.target(BASE + "/duke/127.0.0.1/22/ssh").request().post(null);
+	final Response response = this.client.target(BASE +
+		"/duke/127.0.0.1/22/ssh").request().post(null);
 	assertThat(response.getStatus()).isEqualTo(Response.Status.CREATED.getStatusCode());
 	assertThat(response.getLocation().toString()).isEqualTo(BASE + "/duke");
     }
 
     @Test
     public void verifyRoundtripOfAdditionAndRetrivalWorks() {
-	final Response response = this.client.target(BASE + "/dutchess/127.0.0.1/22/ssh").request().post(null);
+	final Response response = this.client.target(BASE +
+		"/dutchess/127.0.0.1/22/ssh").request().post(null);
 	assertThat(response.getStatus()).isEqualTo(Status.CREATED.getStatusCode());
 
-	final Host actualHost = this.client.target(BASE + "/dutchess").request(MediaType.APPLICATION_JSON)
+	final Host actualHost = this.client.target(BASE +
+		"/dutchess").request(MediaType.APPLICATION_JSON)
 		.get(Host.class);
 	assertThat(actualHost).isNotNull();
 	assertThat(actualHost.getHostname()).isEqualTo("dutchess");
@@ -61,13 +64,13 @@ public class HostsResourceIT extends Arquillian {
     }
 
     @Test
-    public void list() {
-	this.client.target(BASE + "/duke1/127.0.0.1/22/ssh").request().header(SecurityFilter.TOKEN_HEADER_NAME, "4711")
+    public void testListAllWorks() {
+	this.client.target(BASE + "/duke1/127.0.0.1/22/ssh").request().header(SecurityRoleFilter.TOKEN_HEADER_NAME, "4711")
 	.post(null);
-	this.client.target(BASE + "/duke2/127.0.0.1/22/ssh").request().header(SecurityFilter.TOKEN_HEADER_NAME, "4711")
+	this.client.target(BASE + "/duke2/127.0.0.1/22/ssh").request().header(SecurityRoleFilter.TOKEN_HEADER_NAME, "4711")
 	.post(null);
 
-	final List<Host> hosts = this.client.target(BASE + "/" + HostsResource.RELPATH_LIST_ALL).request()
+	final List<Host> hosts = this.client.target(BASE + "/" + HostsResource.RELPATH_LIST_ALL).request().header(SecurityRoleFilter.TOKEN_HEADER_NAME, "4711")
 		.get(new GenericType<List<Host>>() {
 		});
 	assertThat(hosts.size()).isGreaterThanOrEqualTo(2);

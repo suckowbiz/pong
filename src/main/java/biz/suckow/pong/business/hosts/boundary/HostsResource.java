@@ -23,12 +23,15 @@ import javax.ws.rs.core.UriInfo;
 
 import biz.suckow.pong.business.hosts.control.HostStore;
 import biz.suckow.pong.business.hosts.entity.Host;
+import biz.suckow.pong.business.security.entity.Role;
+import biz.suckow.pong.business.security.entity.TokenRoleAllowed;
 
 @Singleton
 @Path(HostsResource.PATH_BASE)
 public class HostsResource {
     public static final String PATH_BASE = "hosts";
     public static final String RELPATH_LIST_ALL = "all";
+    public static final String PATH_PARAM_HOSTNAME = "hostname";
 
     @Inject
     private HostStore store;
@@ -40,7 +43,7 @@ public class HostsResource {
 
     @POST
     @Path("{hostname}/{ip}/{port}/{service}")
-    public Response addHost(@NotNull @Size(min = 3) @PathParam("hostname") final String hostname,
+    public Response addHost(@NotNull @Size(min = 3) @PathParam(PATH_PARAM_HOSTNAME) final String hostname,
 	    @NotNull @Size(min = 7) @PathParam("ip") final String ip,
 	    @NotNull @Size(min = 3) @PathParam("service") final String service,
 	    @NotNull @DecimalMin(value = "1") @PathParam("port") final int port, @Context final UriInfo info) {
@@ -56,16 +59,17 @@ public class HostsResource {
     @GET
     @Path("{hostname}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getHost(@PathParam("hostname") final String hostname)
+    public Response getHost(@PathParam(PATH_PARAM_HOSTNAME) final String hostname)
 	    throws URISyntaxException {
 	Response response = Response.status(Status.NOT_FOUND).build();
-	final Optional<Host> possibleHost = this.store.get(hostname);
+	final Optional<Host> possibleHost = this.store.getByHostname(hostname);
 	if (possibleHost.isPresent()) {
 	    response = Response.ok(possibleHost.get()).build();
 	}
 	return response;
     }
 
+    @TokenRoleAllowed(Role.SUPER)
     @GET
     @Path(RELPATH_LIST_ALL)
     @Produces(MediaType.APPLICATION_JSON)

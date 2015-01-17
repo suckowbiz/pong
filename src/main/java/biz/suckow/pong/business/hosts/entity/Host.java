@@ -12,6 +12,16 @@ public class Host implements Comparable<Host> {
     private String ip;
     private Integer port;
     private String service;
+    private String token;
+
+    public String getToken() {
+	return this.token;
+    }
+
+    public Host setToken(final String token) {
+	this.token = token;
+	return this;
+    }
 
     public String getHostname() {
 	return this.hostname;

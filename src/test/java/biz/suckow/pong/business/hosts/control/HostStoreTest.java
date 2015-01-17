@@ -26,11 +26,21 @@ public class HostStoreTest extends EasyMockSupport {
     }
 
     @Test
+    public void verifyFetchByTokenWorks() {
+	final Host expectedHost = new Host().setHostname("duke").setIp("127.0.0.1").setPort(22).setService("ssh").setToken("4711");
+	this.cut.add(expectedHost);
+
+	final Optional<Host> actualHost = this.cut.getByToken("4711");
+	assertThat(actualHost.isPresent());
+	assertThat(actualHost.get().getToken()).isEqualTo("4711");
+    }
+
+    @Test
     public void verifyAdditionStoresCorrectly() {
 	final Host expectedHost = new Host().setHostname("duke").setIp("127.0.0.1").setPort(22).setService("ssh");
 	this.cut.add(expectedHost);
 
-	final Optional<Host> actualHost = this.cut.get(expectedHost.getHostname());
+	final Optional<Host> actualHost = this.cut.getByHostname(expectedHost.getHostname());
 	assertThat(actualHost.isPresent());
 	assertThat(actualHost.get().getHostname()).isEqualTo(expectedHost.getHostname());
 	assertThat(actualHost.get().getIp()).isEqualTo(expectedHost.getIp());
@@ -48,14 +58,14 @@ public class HostStoreTest extends EasyMockSupport {
 	expectedHost.setHostname(refreshedHostname);
 	this.cut.add(expectedHost);
 
-	final Optional<Host> actualHost = this.cut.get(expectedHost.getHostname());
+	final Optional<Host> actualHost = this.cut.getByHostname(expectedHost.getHostname());
 	assertThat(actualHost.isPresent());
 	assertThat(actualHost.get().getHostname()).isEqualTo(refreshedHostname);
     }
 
     @Test
     public void verifyCannotGetNotExistingItem() {
-	final Optional<Host> actualHost = this.cut.get("noname");
+	final Optional<Host> actualHost = this.cut.getByHostname("noname");
 	assertThat(actualHost.isPresent()).isFalse();
     }
 }

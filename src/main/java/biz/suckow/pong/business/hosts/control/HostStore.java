@@ -29,11 +29,28 @@ public class HostStore {
 		this.cache.size() });
     }
 
-    public Optional<Host> get(final String hostname) {
+    public Optional<Host> getByToken(final String token) {
 	Optional<Host> result = Optional.empty();
-	for (final Host remoteHost : this.cache) {
-	    if (remoteHost.getHostname().equalsIgnoreCase(hostname)) {
-		result = Optional.of(remoteHost);
+	if (token == null) {
+	    return result;
+	}
+	for (final Host host : this.cache) {
+	    if (token.equals(host.getToken())) {
+		result = Optional.of(host);
+		break;
+	    }
+	}
+	return result;
+    }
+
+    public Optional<Host> getByHostname(final String hostname) {
+	Optional<Host> result = Optional.empty();
+	if (hostname == null) {
+	    return result;
+	}
+	for (final Host host : this.cache) {
+	    if (hostname.equalsIgnoreCase(host.getHostname())) {
+		result = Optional.of(host);
 		break;
 	    }
 	}
