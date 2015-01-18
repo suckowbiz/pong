@@ -187,12 +187,6 @@
 			<version>7.0</version>
 			<scope>provided</scope>
 		</dependency>
-		<!-- Added for application configuration. -->
-		<dependency>
-			<groupId>org.yaml</groupId>
-			<artifactId>snakeyaml</artifactId>
-			<version>${version.snakeyaml}</version>
-		</dependency>
 	</dependencies>
 	<properties>
 		<maven.compiler.source>1.8</maven.compiler.source>
@@ -219,7 +213,6 @@
 		<version.maven-failsafe-plugin>2.18</version.maven-failsafe-plugin>
 		<version.maven-surefire-plugin>2.18</version.maven-surefire-plugin>
 		<version.shrinkwrap-resolver-depchain>2.1.1</version.shrinkwrap-resolver-depchain>
-		<version.snakeyaml>1.14</version.snakeyaml>
 		<version.testng>6.8.8</version.testng>
 		<version.wildfly-arquillian-container-embedded>8.2.0.Final</version.wildfly-arquillian-container-embedded>
 		<version.wildfly-dist>8.2.0.Final</version.wildfly-dist>
