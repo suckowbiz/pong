@@ -11,6 +11,7 @@ import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -23,8 +24,9 @@ import javax.ws.rs.core.UriInfo;
 
 import biz.suckow.pong.business.hosts.control.HostStore;
 import biz.suckow.pong.business.hosts.entity.Host;
-import biz.suckow.pong.business.security.entity.Role;
-import biz.suckow.pong.business.security.entity.TokenRoleAllowed;
+import biz.suckow.pong.business.security.control.SecurityFilter;
+import biz.suckow.pong.business.security.entity.Secured;
+import biz.suckow.pong.business.security.entity.Strategy;
 
 @Singleton
 @Path(HostsResource.PATH_BASE)
@@ -41,13 +43,16 @@ public class HostsResource {
 	return Response.ok().entity(this.getClass().getSimpleName()).build();
     }
 
+    @Secured(Strategy.IDENTITY)
     @POST
     @Path("{hostname}/{ip}/{port}/{service}")
     public Response addHost(@NotNull @Size(min = 3) @PathParam(PATH_PARAM_HOSTNAME) final String hostname,
 	    @NotNull @Size(min = 7) @PathParam("ip") final String ip,
 	    @NotNull @Size(min = 3) @PathParam("service") final String service,
-	    @NotNull @DecimalMin(value = "1") @PathParam("port") final int port, @Context final UriInfo info) {
-	final Host remoteHost = new Host().setHostname(hostname).setIp(ip).setPort(port).setService(service);
+	    @NotNull @DecimalMin(value = "1") @PathParam("port") final int port,
+	    @HeaderParam(SecurityFilter.TOKEN_HEADER_NAME) final String token, @Context final UriInfo info) {
+	final Host remoteHost = new Host().setHostname(hostname).setToken(token).setIp(ip).setPort(port)
+		.setService(service);
 	this.store.add(remoteHost);
 
 	final String path = new StringBuilder("/").append(PATH_BASE).append("/").append(remoteHost.getHostname())
@@ -56,11 +61,11 @@ public class HostsResource {
 	return Response.created(uri).build();
     }
 
+    @Secured(Strategy.IDENTITY)
     @GET
     @Path("{hostname}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getHost(@PathParam(PATH_PARAM_HOSTNAME) final String hostname)
-	    throws URISyntaxException {
+    public Response getHost(@PathParam(PATH_PARAM_HOSTNAME) final String hostname) throws URISyntaxException {
 	Response response = Response.status(Status.NOT_FOUND).build();
 	final Optional<Host> possibleHost = this.store.getByHostname(hostname);
 	if (possibleHost.isPresent()) {
@@ -69,7 +74,7 @@ public class HostsResource {
 	return response;
     }
 
-    @TokenRoleAllowed(Role.SUPER)
+    @Secured(Strategy.SUPERTOKEN)
     @GET
     @Path(RELPATH_LIST_ALL)
     @Produces(MediaType.APPLICATION_JSON)
