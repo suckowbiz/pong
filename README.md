@@ -1,4 +1,5 @@
 # Pong
+[![Build Status](https://drone.io/github.com/suckowbiz/pong/status.png)](https://drone.io/github.com/suckowbiz/pong/latest)
 
 # What is it?
 A full stack Java EE 7 enabled Java 8 web application to store infrastructure details of distributed hosts.
