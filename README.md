@@ -12,7 +12,7 @@ supertoken=4711
 ```
 
 # Use it
-*POST* information that *duke* is located at *127.0.0.1* accessible via *ssh* on port *22*. A header parameter *X-PONG-TOKEN* is expected. It is initiated on first time.
+*POST* information that *duke* is located at *127.0.0.1* accessible via *ssh* on port *22*. A header parameter *X-PONG-TOKEN* is expected. It can be initiated with the first time POSTING that request.
 ```
 http://localhost:8080/pong-0.0.1-SNAPSHOT/resources/hosts/duke/127.0.0.1/22/ssh
 ```
