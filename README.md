@@ -2,7 +2,7 @@
 [![Build Status](https://travis-ci.org/suckowbiz/pong.svg)](https://travis-ci.org/suckowbiz/pong)  [![Coverage Status](https://coveralls.io/repos/suckowbiz/pong/badge.svg)](https://coveralls.io/r/suckowbiz/pong)
 
 # What is it?
-A full stack Java EE 7 enabled Java 8 web application to store infrastructure details of distributed host(s).
+A Java EE 7 enabled Java 8 web application to store infrastructure details of distributed host(s).
 
 # Set up
 In order to provide administrative access little configuration is required. For this purpose the path to a configuration file is expected to be available as system property named "PONG_CONFIG_PATH". The configuration file must contain the following properties:
